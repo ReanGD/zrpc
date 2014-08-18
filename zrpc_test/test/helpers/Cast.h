@@ -9,6 +9,7 @@ namespace helper
 {
 
 zrpc::tBinary StrToBin(const std::string& id);
+std::string BinToStr(const zrpc::tBinary& bin);
 
 }
 
