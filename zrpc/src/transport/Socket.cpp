@@ -76,11 +76,11 @@ private:
     zmq_msg_t* m_msg;
 };
 
-void zrpc::CSocket::Recv(tBinaryPackage& package)
+zrpc::tBinaryPackage zrpc::CSocket::Recv(void)
 {
     zmq_msg_t msg;
 
-    package.clear();
+    tBinaryPackage package;
     do
     {
         if(zmq_msg_init(&msg) != 0)
@@ -96,6 +96,8 @@ void zrpc::CSocket::Recv(tBinaryPackage& package)
         package.push_back(tBinary(begin, end));
 
     }while(zmq_msg_more(&msg));
+
+    return package;
 }
 
 void zrpc::CSocket::Close(void)

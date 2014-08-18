@@ -29,7 +29,7 @@ private:
     void* Native(void);
 public:
     bool Send(const tBinaryPackage& package);
-    void Recv(tBinaryPackage& package);
+    tBinaryPackage Recv(void);
 	void Close(void);
 private:
     void* m_socket = nullptr;
