@@ -42,7 +42,7 @@ bool zrpc::CSocket::Send(const tBinaryPackage& package)
         auto bin_data = *it;
         is_end = (++it == package.end());
 
-        int flags = (is_end ? 0 : ZMQ_SNDMORE) | (m_is_sync ? 0 : ZMQ_DONTWAIT);
+        int flags = (is_end ? 0 : ZMQ_SNDMORE) | (m_is_sync ? ZMQ_DONTWAIT : 0);
         int rc = zmq_send(m_socket, &bin_data[0], bin_data.size(), flags);
         if(rc == -1)
         {

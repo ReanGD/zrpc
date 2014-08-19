@@ -1,4 +1,4 @@
-#include "TestSendRecv.h"
+#include "SendRecv.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -21,7 +21,7 @@ namespace
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]/*server*/
+        .Run([&]//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -34,12 +34,13 @@ namespace
 
             signal.Wait(1);
         })
-        .Run([&]/*client*/
+        .Run([&]//client
         {
             signal.Wait(0);
 
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 
             EXPECT_EQ(true,
                  socket->Send(tBinaryPackage{helper::StrToBin("Hello")}));
@@ -58,7 +59,7 @@ namespace
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]/*server*/
+        .Run([&]//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -71,7 +72,7 @@ namespace
 
             signal.Wait(1);
         })
-        .Run([&]/*client*/
+        .Run([&]//client
         {
             signal.Wait(0);
 
@@ -95,7 +96,7 @@ namespace
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]/*server*/
+        .Run([&]//server
         {
             CSocketManager mng;
             CSocketGroup group;
@@ -113,7 +114,7 @@ namespace
 
             signal.Wait(1);
         })
-        .Run([&]/*client*/
+        .Run([&]//client
         {
             signal.Wait(0);
 
@@ -121,6 +122,7 @@ namespace
             CSocketGroup group;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
             group.Add(socket);
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 
             EXPECT_EQ(true,
                  socket->Send(tBinaryPackage{helper::StrToBin("Hello")}));
@@ -143,7 +145,7 @@ namespace
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]/*server*/
+        .Run([&]//server
         {
             CSocketManager mng;
             CSocketGroup group;
@@ -161,7 +163,7 @@ namespace
 
             signal.Wait(1);
         })
-        .Run([&]/*client*/
+        .Run([&]//client
         {
             signal.Wait(0);
 
@@ -191,7 +193,7 @@ namespace
         std::string client_base_id_str("client_id");
 
         helper::CThreadPool()
-        .Run([&]/*server*/
+        .Run([&]//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -212,7 +214,7 @@ namespace
             }
             signal.Wait(1);
         })
-        .RunMulti(3, [&]/*client*/
+        .RunMulti(3, [&]//client
         {
             signal.Wait(0);
 
@@ -227,7 +229,7 @@ namespace
             EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("World")}),
                  socket->Recv());
 
-            signal.Send(1);
+            signal.Send(1);//Fix!!
         });
     }
 

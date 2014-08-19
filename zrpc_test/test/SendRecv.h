@@ -1,6 +1,6 @@
 #pragma once
-#ifndef TESTSENDRECV_H
-#define TESTSENDRECV_H
+#ifndef SENDRECV_H
+#define SENDRECV_H
 
 #include "gtest/gtest.h"
 
@@ -9,4 +9,4 @@ class TestSendRecv
 {
 };
 
-#endif // TESTSENDRECV_H
+#endif // SENDRECV_H
