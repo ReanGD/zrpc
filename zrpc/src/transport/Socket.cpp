@@ -1,7 +1,9 @@
 #include "Socket.h"
 
-#include <stdexcept>
 #include <utility>
+#include <climits>
+#include <stdexcept>
+
 #include <zmq.h>
 
 #include "ZException.h"
@@ -78,9 +80,27 @@ private:
 
 zrpc::tBinaryPackage zrpc::CSocket::Recv(void)
 {
-    zmq_msg_t msg;
-
     tBinaryPackage package;
+    if(!Recv(package))
+        throw CZException(EAGAIN);
+
+    return package;
+}
+
+bool zrpc::CSocket::Recv(zrpc::tBinaryPackage& package, const std::chrono::milliseconds timeout/*=std::chrono::milliseconds::max()*/)
+{
+    int val_timeout;
+    if((timeout == std::chrono::milliseconds::max()) || (timeout.count() > INT_MAX))
+        val_timeout = -1;
+    else
+        val_timeout = static_cast<int>(timeout.count());
+
+    int rc = zmq_setsockopt(m_socket, ZMQ_RCVTIMEO, &val_timeout, sizeof(val_timeout));
+    if (rc != 0)
+        throw CZException();
+
+    zmq_msg_t msg;
+    package.clear();
     do
     {
         if(zmq_msg_init(&msg) != 0)
@@ -88,8 +108,18 @@ zrpc::tBinaryPackage zrpc::CSocket::Recv(void)
 
         AutoCloseMsg msg_close(&msg);
         int recv_size = zmq_msg_recv(&msg, m_socket, 0);
-        if(recv_size < 0)
+        if(recv_size == -1)
+        {
+            if(val_timeout != -1)
+            {
+                int error_code = zmq_errno();
+                if(error_code == EAGAIN)
+                    return false;
+                else
+                    throw CZException(error_code);
+            }
             throw CZException();
+        }
 
         const uint8_t* begin = static_cast<uint8_t*>(zmq_msg_data(&msg));
         const uint8_t* end = begin + static_cast<size_t>(recv_size);
@@ -97,7 +127,7 @@ zrpc::tBinaryPackage zrpc::CSocket::Recv(void)
 
     }while(zmq_msg_more(&msg));
 
-    return package;
+    return true;
 }
 
 void zrpc::CSocket::Close(void)

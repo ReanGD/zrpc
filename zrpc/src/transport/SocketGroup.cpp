@@ -58,7 +58,7 @@ void zrpc::CSocketGroup::Remove(std::shared_ptr<CSocket> socket)
     pimpl->Recalc();
 }
 
-std::list<std::shared_ptr<zrpc::CSocket>> zrpc::CSocketGroup::Recv(std::chrono::milliseconds timeout/*= std::chrono::milliseconds::max()*/)
+std::list<std::shared_ptr<zrpc::CSocket>> zrpc::CSocketGroup::Recv(const std::chrono::milliseconds timeout/*= std::chrono::milliseconds::max()*/)
 {
     std::list<std::shared_ptr<CSocket>> result;
     if(pimpl->m_sockets.empty())
@@ -68,7 +68,13 @@ std::list<std::shared_ptr<zrpc::CSocket>> zrpc::CSocketGroup::Recv(std::chrono::
         return result;
     }
 
-    int rc = zmq_poll(&pimpl->m_items[0], static_cast<int>(pimpl->m_items.size()), static_cast<long>(timeout.count()));
+    long val_timeout;
+    if((timeout == std::chrono::milliseconds::max()) || (timeout.count() > LONG_MAX))
+        val_timeout = -1;
+    else
+        val_timeout = static_cast<long>(timeout.count());
+
+    int rc = zmq_poll(&pimpl->m_items[0], static_cast<int>(pimpl->m_items.size()), val_timeout);
     if(rc < 0)
         throw CZException();
     if(rc == 0)

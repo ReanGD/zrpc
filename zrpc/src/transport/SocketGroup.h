@@ -25,7 +25,7 @@ public:
 public:
     void Add(std::shared_ptr<CSocket> socket);
     void Remove(std::shared_ptr<CSocket> socket);
-    std::list<std::shared_ptr<CSocket>> Recv(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    std::list<std::shared_ptr<CSocket>> Recv(const std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 private:
     class impl; std::shared_ptr<impl> pimpl;
 };

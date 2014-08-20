@@ -4,6 +4,7 @@
 
 #include <list>
 #include <vector>
+#include <chrono>
 #include <stdint.h>
 
 namespace zrpc
@@ -30,6 +31,7 @@ private:
 public:
     bool Send(const tBinaryPackage& package);
     tBinaryPackage Recv(void);
+    bool Recv(tBinaryPackage& package, const std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 	void Close(void);
 private:
     void* m_socket = nullptr;
