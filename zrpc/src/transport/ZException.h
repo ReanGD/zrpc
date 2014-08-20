@@ -2,8 +2,7 @@
 #ifndef CZEXCEPTION_H
 #define CZEXCEPTION_H
 
-//#include <string>
-#include <exception>
+#include <stdexcept>
 
 
 namespace zrpc
@@ -22,16 +21,13 @@ private:
 	int m_error_code;
 };
 
-/*class CZTextException
-     : public std::exception
+class timeout_error
+        : public std::runtime_error
 {
 public:
-    CZTextException(const std::string& msg);
-public:
-    const char *what(void) const noexcept override;
-private:
-    std::string m_msg;
-};*/
+  explicit timeout_error(const std::string& __arg);
+  virtual ~timeout_error(void);
+};
 
 }
 

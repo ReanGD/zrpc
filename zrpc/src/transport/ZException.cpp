@@ -25,15 +25,13 @@ int zrpc::CZException::GetCode(void) const
 	return m_error_code;
 }
 
-/*
-CZTextException::CZTextException(const std::string &msg)
-    : m_msg(msg)
+zrpc::timeout_error::timeout_error(const std::string& __arg)
+    : std::runtime_error(__arg)
 {
 
 }
 
-const char *CZTextException::what(void) const noexcept
+zrpc::timeout_error::~timeout_error(void)
 {
-    return m_msg.c_str();
+
 }
-*/

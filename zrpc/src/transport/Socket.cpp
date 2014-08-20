@@ -2,7 +2,9 @@
 
 #include <utility>
 #include <climits>
-#include <stdexcept>
+
+#include <boost/chrono/duration.hpp>
+#include <boost/thread/thread_only.hpp>
 
 #include <zmq.h>
 
@@ -30,6 +32,37 @@ zrpc::CSocket::~CSocket()
 void *zrpc::CSocket::Native(void)
 {
     return m_socket;
+}
+
+zrpc::tBinaryPackage zrpc::CSocket::Handshake(const tBinaryPackage& package,
+                         const std::chrono::milliseconds total_timeout/* = std::chrono::milliseconds::max()*/,
+                         const std::chrono::milliseconds retry_timeout/* = std::chrono::milliseconds(100)*/)
+{
+    using namespace std::chrono;
+
+    auto start = system_clock::now();
+    if(m_is_sync)
+    {
+        while(!Send(package))
+        {
+            if(duration_cast<milliseconds>(system_clock::now() - start) >= total_timeout)
+                timeout_error("Failed to send the package on time");
+            boost::chrono::milliseconds boost_timeout(retry_timeout.count());
+            boost::this_thread::sleep_for(boost_timeout);
+        }
+    }else
+        Send(package);
+
+    auto send_finish = system_clock::now();
+    if(duration_cast<milliseconds>(send_finish - start) >= total_timeout)
+        timeout_error("Failed to send the package on time");
+
+    tBinaryPackage answer_package;
+    auto recv_timeout = total_timeout - duration_cast<milliseconds>(send_finish - start);
+    if(!Recv(answer_package, recv_timeout))
+        timeout_error("Failed to recv the package on time");
+
+    return answer_package;
 }
 
 bool zrpc::CSocket::Send(const tBinaryPackage& package)

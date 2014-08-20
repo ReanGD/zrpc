@@ -29,6 +29,9 @@ public:
 private:
     void* Native(void);
 public:
+    tBinaryPackage Handshake(const tBinaryPackage& package,
+                             const std::chrono::milliseconds total_timeout = std::chrono::milliseconds::max(),
+                             const std::chrono::milliseconds retry_timeout = std::chrono::milliseconds(100));
     bool Send(const tBinaryPackage& package);
     tBinaryPackage Recv(void);
     bool Recv(tBinaryPackage& package, const std::chrono::milliseconds timeout = std::chrono::milliseconds::max());

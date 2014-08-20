@@ -1,7 +1,7 @@
 #include "SocketGroup.h"
 
-#include <boost/thread/thread.hpp>
 #include <boost/chrono/duration.hpp>
+#include <boost/thread/thread_only.hpp>
 
 #include <zmq.h>
 
