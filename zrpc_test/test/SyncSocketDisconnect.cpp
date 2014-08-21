@@ -2,12 +2,11 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "helpers/Signals.h"
 #include "helpers/Cast.h"
+#include "helpers/Signals.h"
 #include "helpers/ThreadPool.h"
 
 #include "transport/SocketManager.h"
-#include "transport/SocketGroup.h"
 
 using namespace zrpc;
 
