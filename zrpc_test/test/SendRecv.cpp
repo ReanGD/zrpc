@@ -59,9 +59,9 @@ namespace
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("Hello"), helper::StrToBin("Server")}),
-                 socket->Recv());
+                socket->Recv());
             EXPECT_EQ(true,
-                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello"), helper::StrToBin("Client")}));
+                socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello"), helper::StrToBin("Client")}));
 
             signal.Wait(0);
         })
@@ -71,7 +71,7 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello"), helper::StrToBin("Client")}),
-                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
 
             signal.Send(0);
         });
@@ -91,9 +91,9 @@ namespace
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("Hello Server")}),
-                 socket->Recv());
+                socket->Recv());
             EXPECT_EQ(true,
-                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello Client")}));
+                socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello Client")}));
 
             signal.Wait(0);
         })
@@ -103,7 +103,7 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
-                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
 
             signal.Send(0);
         });
@@ -123,9 +123,9 @@ namespace
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("Hello"), helper::StrToBin("Server")}),
-                 socket->Recv());
+                socket->Recv());
             EXPECT_EQ(true,
-                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello"), helper::StrToBin("Client")}));
+                socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello"), helper::StrToBin("Client")}));
 
             signal.Wait(0);
         })
@@ -135,16 +135,14 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello"), helper::StrToBin("Client")}),
-                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
 
             signal.Send(0);
         });
     }
 
-\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-    TEST_F(TestSendRecv, CheckSync)
-	{
+    TEST_F(TestSendRecv, SendOnSyncSocket)
+    {
         helper::CSignals signal;
         bool is_sync = true;
         auto server_id = helper::StrToBin("server_id");
@@ -155,31 +153,72 @@ namespace
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
-            signal.Send(0);
 
-            EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("Hello")}),
-                 socket->Recv());
+            EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("Hello Server")}),
+                socket->Recv());
             EXPECT_EQ(true,
-                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("World")}));
+                socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello Client")}));
 
-            signal.Wait(1);
+            // one part message
+            EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("ClientMsg")}),
+                socket->Recv());
+            EXPECT_EQ(true,
+                socket->Send(tBinaryPackage{client_id, helper::StrToBin("ServerMsg")}));
+
+            // multi part message
+            EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("Client"), helper::StrToBin("Msg")}),
+                socket->Recv());
+            EXPECT_EQ(true,
+                socket->Send(tBinaryPackage{client_id, helper::StrToBin("Server"), helper::StrToBin("Msg")}));
+
+            // 10 messages
+            for(int i=0; i!=10; ++i)
+            {
+                EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("ClientMsg" + boost::lexical_cast<std::string>(i))}),
+                    socket->Recv());
+                EXPECT_EQ(true,
+                    socket->Send(tBinaryPackage{client_id, helper::StrToBin("ServerMsg" + boost::lexical_cast<std::string>(i))}));
+            }
+
+            signal.Wait(0);
         })
         .Run([&]//client
         {
-            signal.Wait(0);
-
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
             boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 
-            EXPECT_EQ(true,
-                 socket->Send(tBinaryPackage{helper::StrToBin("Hello")}));
-            EXPECT_EQ(tBinaryPackage({helper::StrToBin("World")}),
-                 socket->Recv());
+            EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
 
-            signal.Send(1);
+            // one part message
+            EXPECT_EQ(true,
+                socket->Send(tBinaryPackage{helper::StrToBin("ClientMsg")}));
+            EXPECT_EQ(tBinaryPackage({helper::StrToBin("ServerMsg")}),
+                socket->Recv());
+
+            // multi part message
+            EXPECT_EQ(true,
+                socket->Send(tBinaryPackage{helper::StrToBin("Client"), helper::StrToBin("Msg")}));
+            EXPECT_EQ(tBinaryPackage({helper::StrToBin("Server"), helper::StrToBin("Msg")}),
+                socket->Recv());
+
+            // 10 messages
+            for(int i=0; i!=10; ++i)
+                EXPECT_EQ(true,
+                    socket->Send(tBinaryPackage{helper::StrToBin("ClientMsg" + boost::lexical_cast<std::string>(i))}));
+
+            for(int i=0; i!=10; ++i)
+                EXPECT_EQ(tBinaryPackage({helper::StrToBin("ServerMsg" + boost::lexical_cast<std::string>(i))}),
+                    socket->Recv());
+
+            signal.Send(0);
         });
     }
+
+
+/*------------------------------------------------*/
+
 
     TEST_F(TestSendRecv, CheckAsync)
     {
