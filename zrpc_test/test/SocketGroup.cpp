@@ -3,7 +3,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "helpers/Cast.h"
-#include "helpers/Signals.h"
 #include "helpers/ThreadPool.h"
 
 #include "transport/SocketGroup.h"
@@ -16,13 +15,12 @@ namespace
 
     TEST_F(TestSocketGroup, CheckGroupSync)
     {
-        helper::CSignals signal;
         bool is_sync = true;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             CSocketGroup group;
@@ -40,7 +38,7 @@ namespace
 
             signal.Wait(1);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             signal.Wait(0);
 
@@ -65,13 +63,12 @@ namespace
 
     TEST_F(TestSocketGroup, CheckGroupAsync)
     {
-        helper::CSignals signal;
         bool is_sync = false;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             CSocketGroup group;
@@ -89,7 +86,7 @@ namespace
 
             signal.Wait(1);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             signal.Wait(0);
 

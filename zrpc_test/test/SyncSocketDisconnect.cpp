@@ -3,7 +3,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "helpers/Cast.h"
-#include "helpers/Signals.h"
 #include "helpers/ThreadPool.h"
 
 #include "transport/SocketManager.h"
@@ -32,13 +31,12 @@ namespace
 
     TEST_F(TestSyncSocketDisconnect, SendMsgToDisconnectedServer)
     {
-        helper::CSignals signal;
         bool is_sync = true;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5001", server_id, is_sync);
@@ -51,7 +49,7 @@ namespace
             boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
             signal.Send(1);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             signal.Wait(0);
             CSocketManager mng;

@@ -3,7 +3,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "helpers/Cast.h"
-#include "helpers/Signals.h"
 #include "helpers/ThreadPool.h"
 
 #include "transport/SocketManager.h"
@@ -14,13 +13,12 @@ namespace
 {
     TEST_F(TestSocketOperation, HandshakeOnSyncSocket)
     {
-        helper::CSignals signal;
         bool is_sync = true;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -32,7 +30,7 @@ namespace
 
             signal.Wait(0);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -46,13 +44,12 @@ namespace
 
     TEST_F(TestSocketOperation, MultipartHandshakeOnSyncSocket)
     {
-        helper::CSignals signal;
         bool is_sync = true;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -64,7 +61,7 @@ namespace
 
             signal.Wait(0);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -78,13 +75,12 @@ namespace
 
     TEST_F(TestSocketOperation, HandshakeOnAsyncSocket)
     {
-        helper::CSignals signal;
         bool is_sync = false;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -96,7 +92,7 @@ namespace
 
             signal.Wait(0);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -110,13 +106,12 @@ namespace
 
     TEST_F(TestSocketOperation, MultipartHandshakeOnAsyncSocket)
     {
-        helper::CSignals signal;
         bool is_sync = false;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -128,7 +123,7 @@ namespace
 
             signal.Wait(0);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -142,13 +137,12 @@ namespace
 
     TEST_F(TestSocketOperation, SendOnSyncSocket)
     {
-        helper::CSignals signal;
         bool is_sync = true;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -181,7 +175,7 @@ namespace
 
             signal.Wait(0);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -217,13 +211,12 @@ namespace
 
     TEST_F(TestSocketOperation, SendOnAsyncSocket)
     {
-        helper::CSignals signal;
         bool is_sync = false;
         auto server_id = helper::StrToBin("server_id");
         auto client_id = helper::StrToBin("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -256,7 +249,7 @@ namespace
 
             signal.Wait(0);
         })
-        .Run([&]//client
+        .Run([&](helper::CSignals& signal)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -293,13 +286,12 @@ namespace
 
     TEST_F(TestSocketOperation, CheckMultiClient)
     {
-        helper::CSignals signal;
         bool is_sync = false;
         auto server_id = helper::StrToBin("server_id");
         std::string client_base_id_str("client_id");
 
         helper::CThreadPool()
-        .Run([&]//server
+        .Run([&](helper::CSignals& signal)//server
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
@@ -320,7 +312,7 @@ namespace
             }
             signal.Wait(1);
         })
-        .RunMulti(3, [&]//client
+        .RunMulti(3, [&](helper::CSignals& signal)//client
         {
             signal.Wait(0);
 

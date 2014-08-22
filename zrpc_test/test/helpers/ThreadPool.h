@@ -3,7 +3,10 @@
 #define THREADPOOL_H
 
 #include <list>
+#include <functional>
 #include <boost/thread/thread_only.hpp>
+
+#include "Signals.h"
 
 namespace helper
 {
@@ -14,20 +17,20 @@ public:
     CThreadPool(void) = default;
     ~CThreadPool(void);
 public:
-    template<typename F>
-    CThreadPool& Run(F threadfunc)
+    CThreadPool& Run(std::function<void (helper::CSignals& signal)> threadfunc)
     {
-        m_threads.push_back(std::make_shared<boost::thread>(threadfunc));
+        m_threads.push_back(
+            std::make_shared<boost::thread>(threadfunc, boost::ref(m_signal)));
         return *this;
     }
-    template<typename F>
-    CThreadPool& RunMulti(size_t cnt, F threadfunc)
+    CThreadPool& RunMulti(size_t cnt, std::function<void (helper::CSignals& signal)> threadfunc)
     {
         for(size_t i=0; i!=cnt; ++i)
             Run(threadfunc);
         return *this;
     }
 private:
+    helper::CSignals m_signal;
     std::list<std::shared_ptr<boost::thread>> m_threads;
 };
 
