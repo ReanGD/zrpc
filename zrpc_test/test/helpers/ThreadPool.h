@@ -13,25 +13,19 @@ namespace helper
 
 class CThreadPool
 {
+    using tThreadFunc = std::function<void (helper::CSignals& signal)>;
+public:
+    const static uint32_t FINISH = UINT32_MAX;
 public:
     CThreadPool(void) = default;
     ~CThreadPool(void);
 public:
-    CThreadPool& Run(std::function<void (helper::CSignals& signal)> threadfunc)
-    {
-        m_threads.push_back(
-            std::make_shared<boost::thread>(threadfunc, boost::ref(m_signal)));
-        return *this;
-    }
-    CThreadPool& RunMulti(size_t cnt, std::function<void (helper::CSignals& signal)> threadfunc)
-    {
-        for(size_t i=0; i!=cnt; ++i)
-            Run(threadfunc);
-        return *this;
-    }
+    CThreadPool& Run(tThreadFunc threadfunc, bool is_finish = false);
+    CThreadPool& RunAndFinish(tThreadFunc threadfunc);
+    CThreadPool& RunMulti(size_t cnt, tThreadFunc threadfunc);
 private:
     helper::CSignals m_signal;
-    std::list<std::shared_ptr<boost::thread>> m_threads;
+    std::list<std::pair<std::shared_ptr<boost::thread>,bool>> m_threads;
 };
 
 }

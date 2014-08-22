@@ -28,17 +28,15 @@ namespace
             EXPECT_EQ(true,
                  socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello Client")}));
 
-            signal.Wait(0);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals&)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
                  socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
-
-            signal.Send(0);
         });
     }
 
@@ -59,17 +57,15 @@ namespace
             EXPECT_EQ(true,
                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello"), helper::StrToBin("Client")}));
 
-            signal.Wait(0);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals&)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello"), helper::StrToBin("Client")}),
                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
-
-            signal.Send(0);
         });
     }
 
@@ -90,17 +86,15 @@ namespace
             EXPECT_EQ(true,
                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello Client")}));
 
-            signal.Wait(0);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals&)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
-
-            signal.Send(0);
         });
     }
 
@@ -121,17 +115,15 @@ namespace
             EXPECT_EQ(true,
                 socket->Send(tBinaryPackage{client_id, helper::StrToBin("Hello"), helper::StrToBin("Client")}));
 
-            signal.Wait(0);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals&)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello"), helper::StrToBin("Client")}),
                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
-
-            signal.Send(0);
         });
     }
 
@@ -173,9 +165,9 @@ namespace
                     socket->Send(tBinaryPackage{client_id, helper::StrToBin("ServerMsg" + boost::lexical_cast<std::string>(i))}));
             }
 
-            signal.Wait(0);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals&)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -204,8 +196,6 @@ namespace
             for(int i=0; i!=10; ++i)
                 EXPECT_EQ(tBinaryPackage({helper::StrToBin("ServerMsg" + boost::lexical_cast<std::string>(i))}),
                     socket->Recv());
-
-            signal.Send(0);
         });
     }
 
@@ -247,9 +237,9 @@ namespace
                     socket->Send(tBinaryPackage{client_id, helper::StrToBin("ServerMsg" + boost::lexical_cast<std::string>(i))}));
             }
 
-            signal.Wait(0);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals&)//client
         {
             CSocketManager mng;
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
@@ -278,8 +268,6 @@ namespace
             for(int i=0; i!=10; ++i)
                 EXPECT_EQ(tBinaryPackage({helper::StrToBin("ServerMsg" + boost::lexical_cast<std::string>(i))}),
                     socket->Recv());
-
-            signal.Send(0);
         });
     }
 /*------------------------------------------------*/

@@ -36,9 +36,9 @@ namespace
             EXPECT_EQ(true,
                  (*recv_sockets.begin())->Send(tBinaryPackage{client_id, helper::StrToBin("World")}));
 
-            signal.Wait(1);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals& signal)//client
         {
             signal.Wait(0);
 
@@ -56,8 +56,6 @@ namespace
                  recv_sockets.size());
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("World")}),
                  (*recv_sockets.begin())->Recv());
-
-            signal.Send(1);
         });
     }
 
@@ -84,9 +82,9 @@ namespace
             EXPECT_EQ(true,
                  (*recv_sockets.begin())->Send(tBinaryPackage{client_id, helper::StrToBin("World")}));
 
-            signal.Wait(1);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .Run([&](helper::CSignals& signal)//client
+        .RunAndFinish([&](helper::CSignals& signal)//client
         {
             signal.Wait(0);
 
@@ -103,8 +101,6 @@ namespace
                  recv_sockets.size());
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("World")}),
                  (*recv_sockets.begin())->Recv());
-
-            signal.Send(1);
         });
     }
 
