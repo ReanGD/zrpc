@@ -31,6 +31,13 @@ helper::CThreadPool &helper::CThreadPool::RunAndFinish(tThreadFunc threadfunc)
 helper::CThreadPool &helper::CThreadPool::RunMulti(size_t cnt, tThreadFunc threadfunc)
 {
     for(size_t i=0; i!=cnt; ++i)
-        Run(threadfunc);
+        Run(threadfunc, false);
+    return *this;
+}
+
+helper::CThreadPool &helper::CThreadPool::RunMultiAndFinish(size_t cnt, tThreadFunc threadfunc)
+{
+    for(size_t i=0; i!=cnt; ++i)
+        Run(threadfunc, true);
     return *this;
 }

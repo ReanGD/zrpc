@@ -270,7 +270,6 @@ namespace
                     socket->Recv());
         });
     }
-/*------------------------------------------------*/
 
     TEST_F(TestSocketOperation, CheckMultiClient)
     {
@@ -283,7 +282,6 @@ namespace
         {
             CSocketManager mng;
             auto socket = mng.CreateServerSocket("tcp://*:5000", server_id, is_sync);
-            signal.Send(0);
 
             for(int i=0; i!=3; ++i)
             {
@@ -298,12 +296,10 @@ namespace
                 EXPECT_EQ(true,
                      socket->Send(tBinaryPackage{client_id, client_id, helper::StrToBin("World")}));
             }
-            signal.Wait(1);
+            signal.Wait(helper::CThreadPool::FINISH);
         })
-        .RunMulti(3, [&](helper::CSignals& signal)//client
+        .RunMultiAndFinish(3, [&](helper::CSignals&)//client
         {
-            signal.Wait(0);
-
             CSocketManager mng;
 
             auto client_id = helper::StrToBin(client_base_id_str + ":" + boost::lexical_cast<std::string>(boost::this_thread::get_id()));
@@ -314,8 +310,6 @@ namespace
 
             EXPECT_EQ(tBinaryPackage({client_id, helper::StrToBin("World")}),
                  socket->Recv());
-
-            signal.Send(1);//Fix!!
         });
     }
 
