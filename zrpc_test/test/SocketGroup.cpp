@@ -9,6 +9,7 @@
 #include "transport/SocketManager.h"
 
 using namespace zrpc;
+using namespace std::chrono;
 
 namespace
 {

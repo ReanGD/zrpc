@@ -8,6 +8,7 @@
 #include "transport/SocketManager.h"
 
 using namespace zrpc;
+using namespace std::chrono;
 
 namespace
 {
@@ -36,7 +37,7 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
-                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                 socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, seconds(10), milliseconds(1)));
         });
     }
 
@@ -65,7 +66,7 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello"), helper::StrToBin("Client")}),
-                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, seconds(10), milliseconds(1)));
         });
     }
 
@@ -94,7 +95,7 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
-                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, seconds(10), milliseconds(1)));
         });
     }
 
@@ -123,7 +124,7 @@ namespace
             auto socket = mng.CreateClientSocket("tcp://127.0.0.1:5000", client_id, is_sync);
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello"), helper::StrToBin("Client")}),
-                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello"), helper::StrToBin("Server")}, seconds(10), milliseconds(1)));
         });
     }
 
@@ -174,7 +175,7 @@ namespace
             boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
-                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, seconds(10), milliseconds(1)));
 
             // one part message
             EXPECT_EQ(true,
@@ -246,7 +247,7 @@ namespace
             boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 
             EXPECT_EQ(tBinaryPackage({helper::StrToBin("Hello Client")}),
-                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, std::chrono::seconds(10), std::chrono::milliseconds(1)));
+                socket->Handshake(tBinaryPackage{helper::StrToBin("Hello Server")}, seconds(10), milliseconds(1)));
 
             // one part message
             EXPECT_EQ(true,
